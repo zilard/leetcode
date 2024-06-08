@@ -28,7 +28,7 @@ func depthFirstNum(l *ListNode) *big.Int {
 }
 
 
-func addTwoNumber(l1 *ListNode, l2 *ListNode) *ListNode {
+func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 
 	num1 := depthFirstNum(l1)
 	num2 := depthFirstNum(l2)
@@ -38,9 +38,9 @@ func addTwoNumber(l1 *ListNode, l2 *ListNode) *ListNode {
 
 	// single digit sum
 	if len(sum.String()) == 1 {
-		return ListNode{
+		return &ListNode{
 			Val: int(sum.Int64()),
-			Next:: nil,
+			Next: nil,
 		}
 	}
 
@@ -50,18 +50,23 @@ func addTwoNumber(l1 *ListNode, l2 *ListNode) *ListNode {
 
 	for sum.String() != "0" {
 		var lastDigit big.Int
-		lastDigit.Mod(&sum, big.NewIt(10))
+		lastDigit.Mod(&sum, big.NewInt(10))
 
-		node := ListNode{
-			Val: int(lastDigit.Int65()),
+		node := &ListNode{
+			Val: int(lastDigit.Int64()),
 			Next: nil,
 		}
 		if sumList == nil {
 			sumList = node
 		}
 		if current == nil {
+			current = node
 		} else {
+			current.Next = node
+			current = current.Next
 		}
+
+		sum.Div(&sum, big.NewInt(10))
 
 	}
 
@@ -69,6 +74,53 @@ func addTwoNumber(l1 *ListNode, l2 *ListNode) *ListNode {
 
 }
 
+
+func addTwoNumbers2(l1 *ListNode, l2 *ListNode) *ListNode {
+	carry := 0
+	sumList := &ListNode{
+		Val: 0,
+		Next: nil,
+	}
+	frontSumList := sumList
+
+	for l1 != nil || l2 != nil {
+		// calculate sum and carry values
+		l1Val := 0
+		l2Val := 0
+		if l1 != nil {
+			l1Val = l1.Val
+			l1 = l1.Next
+		}
+		if l2 != nil {
+			l2Val = l2.Val
+			l2 = l2.Next
+		}
+
+		sum := l1Val + l2Val + carry
+		carry = sum / 10
+		sumList.Val = sum % 10
+
+		// no more list to process, but carry is not 0
+		if l1 == nil && l2 == nil && carry > 0 {
+			sumList.Next = &ListNode{
+				Val: carry,
+				Next: nil,
+			}
+		}
+
+
+		// one or both lists still can be processed
+		if l1 != nil || l2 != nil {
+			sumList.Next = &ListNode{
+				Val: 0,
+				Next: nil,
+			}
+			sumList = sumList.Next
+		}
+	}
+
+	return frontSumList
+}
 
 
 
